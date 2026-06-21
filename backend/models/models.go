@@ -151,3 +151,235 @@ type SloshAnalysisResult struct {
 	BalanceEfficiency float64   `json:"balance_efficiency"`
 	TimeSeries        []float64 `json:"time_series,omitempty"`
 }
+
+// ----------------- Feature 1: 古代常平架装置对比 -----------------
+
+type DeviceBalanceComparison struct {
+	ID                uuid.UUID  `json:"id" db:"id"`
+	SessionID         string     `json:"session_id" db:"session_id"`
+	DeviceCodes       []string   `json:"device_codes" db:"-"`
+	DeviceCodesStr    string     `json:"-" db:"device_codes_str"`
+	MotionProfile     string     `json:"motion_profile" db:"motion_profile"`
+	DurationSec       float64    `json:"duration_sec" db:"duration_sec"`
+	AnalysisDataJSON  *string    `json:"analysis_data,omitempty" db:"analysis_data_json"`
+	CreatedAt         time.Time  `json:"created_at" db:"created_at"`
+}
+
+type DeviceBalanceMetrics struct {
+	DeviceCode        string  `json:"device_code"`
+	DeviceName        string  `json:"device_name"`
+	DeviceType        string  `json:"device_type"`
+	Dynasty           string  `json:"dynasty"`
+	RingsCount        int     `json:"rings_count"`
+	AvgTiltDeg        float64 `json:"avg_tilt_deg"`
+	MaxTiltDeg        float64 `json:"max_tilt_deg"`
+	MinTiltDeg        float64 `json:"min_tilt_deg"`
+	TiltStdDev        float64 `json:"tilt_std_dev"`
+	AvgBalanceScore   float64 `json:"avg_balance_score"`
+	MinBalanceScore   float64 `json:"min_balance_score"`
+	SettleTimeMs      float64 `json:"settle_time_ms"`
+	OvershootPercent  float64 `json:"overshoot_percent"`
+	DisturbanceGain   float64 `json:"disturbance_gain"`
+	SpillRiskAvg      float64 `json:"spill_risk_avg"`
+	SpillRiskMax      float64 `json:"spill_risk_max"`
+	FrictionPowerW    float64 `json:"friction_power_w"`
+	OverallRank       int     `json:"overall_rank"`
+	TiltTimeSeries    []float64 `json:"tilt_time_series,omitempty"`
+	BalanceTimeSeries []float64 `json:"balance_time_series,omitempty"`
+}
+
+type DeviceComparisonRequest struct {
+	DeviceCodes   []string `json:"device_codes" binding:"required,min=2,max=6"`
+	MotionProfile string   `json:"motion_profile" binding:"required"`
+	DurationSec   float64  `json:"duration_sec"`
+	AmplitudeX    *float64 `json:"amplitude_x,omitempty"`
+	AmplitudeY    *float64 `json:"amplitude_y,omitempty"`
+	AmplitudeZ    *float64 `json:"amplitude_z,omitempty"`
+	FrequencyHz   *float64 `json:"frequency_hz,omitempty"`
+}
+
+type DeviceComparisonResponse struct {
+	SessionID       string                   `json:"session_id"`
+	MotionProfile   string                   `json:"motion_profile"`
+	DurationSec     float64                  `json:"duration_sec"`
+	TimeStepMs      float64                  `json:"time_step_ms"`
+	DeviceMetrics   []DeviceBalanceMetrics   `json:"device_metrics"`
+	RankingSummary  map[string]interface{}   `json:"ranking_summary"`
+}
+
+// ----------------- Feature 2: 跨时代对比 -----------------
+
+type CrossEraComparisonRequest struct {
+	AncientDeviceCodes []string `json:"ancient_device_codes"`
+	ModernDeviceCodes  []string `json:"modern_device_codes"`
+	MotionProfile      string   `json:"motion_profile"`
+	IncludeHistorical  bool     `json:"include_historical_context"`
+}
+
+type CrossEraMetricPoint struct {
+	DeviceCode      string  `json:"device_code"`
+	DeviceName      string  `json:"device_name"`
+	EraTag          string  `json:"era_tag"`
+	Value           float64 `json:"value"`
+	NormalizedScore float64 `json:"normalized_score"`
+}
+
+type CrossEraDimensionResult struct {
+	DimensionKey    string              `json:"dimension_key"`
+	DimensionLabel  string              `json:"dimension_label"`
+	LowerIsBetter   bool                `json:"lower_is_better"`
+	AncientBest     CrossEraMetricPoint `json:"ancient_best"`
+	ModernBest      CrossEraMetricPoint `json:"modern_best"`
+	ImprovementRatio float64             `json:"improvement_ratio"`
+	ImprovementLogDB float64             `json:"improvement_log_db"`
+	Points          []CrossEraMetricPoint `json:"points"`
+}
+
+type CrossEraComparisonResponse struct {
+	ID               uuid.UUID                  `json:"id"`
+	CreatedAt        time.Time                  `json:"created_at"`
+	Title            string                     `json:"title"`
+	HistoricalIntro  string                     `json:"historical_intro"`
+	Dimensions       []CrossEraDimensionResult  `json:"dimensions"`
+	AncientSummary   map[string]interface{}     `json:"ancient_summary"`
+	ModernSummary    map[string]interface{}     `json:"modern_summary"`
+	PhilosophyNote   string                     `json:"philosophy_note"`
+	OverallScore     map[string]float64         `json:"overall_score"`
+	TimeSeriesPlots  map[string][]TimeSeriesPair `json:"time_series_plots,omitempty"`
+}
+
+type TimeSeriesPair struct {
+	T float64 `json:"t"`
+	V float64 `json:"v"`
+}
+
+// ----------------- Feature 3: 香料粘度影响分析 -----------------
+
+type ViscosityScanRequest struct {
+	DeviceCode        string    `json:"device_code"`
+	MotionProfile     string    `json:"motion_profile"`
+	ViscosityRangePas []float64 `json:"viscosity_range_pas"`
+	TemperatureC      *float64  `json:"temperature_c,omitempty"`
+	FillRatio         *float64  `json:"fill_ratio,omitempty"`
+	DensityKgm3       *float64  `json:"density_kgm3,omitempty"`
+	SurfaceTension    *float64  `json:"surface_tension_nm,omitempty"`
+}
+
+type ViscosityDataPoint struct {
+	ViscosityPas        float64 `json:"viscosity_pas"`
+	SpillProbability    float64 `json:"spill_probability"`
+	AvgTiltDeg          float64 `json:"avg_tilt_deg"`
+	MaxTiltDeg          float64 `json:"max_tilt_deg"`
+	DampingRatio        float64 `json:"damping_ratio"`
+	ResonanceFactor     float64 `json:"resonance_factor"`
+	StokesAttenuationDB float64 `json:"stokes_attenuation_db"`
+	BalanceEfficiency   float64 `json:"balance_efficiency"`
+	OptimalFillRatio    float64 `json:"optimal_fill_ratio"`
+}
+
+type ViscosityScanResponse struct {
+	ID                  uuid.UUID                   `json:"id"`
+	CreatedAt           time.Time                   `json:"created_at"`
+	DeviceCode          string                      `json:"device_code"`
+	DeviceName          string                      `json:"device_name"`
+	MotionProfile       string                      `json:"motion_profile"`
+	DefaultTemperatureC float64                     `json:"default_temperature_c"`
+	DefaultFillRatio    float64                     `json:"default_fill_ratio"`
+	ScanPoints          []ViscosityDataPoint        `json:"scan_points"`
+	OptimalViscosityPas float64                     `json:"optimal_viscosity_pas"`
+	CriticalViscosityPas float64                    `json:"critical_viscosity_pas"`
+	FitEquation         string                      `json:"fit_equation"`
+	CorrelationR2       float64                     `json:"correlation_r2"`
+	Recommendation      string                      `json:"recommendation"`
+	TemperatureMap      *[][]ViscosityDataPoint     `json:"temperature_map,omitempty"`
+	FillRatioMap        *[][]ViscosityDataPoint     `json:"fill_ratio_map,omitempty"`
+}
+
+type TempFillSweepRequest struct {
+	DeviceCode        string    `json:"device_code"`
+	MotionProfile     string    `json:"motion_profile"`
+	ViscosityPas      *float64  `json:"viscosity_pas,omitempty"`
+	TemperatureRangeC []float64 `json:"temperature_range_c"`
+	FillRatioRange    []float64 `json:"fill_ratio_range"`
+}
+
+// ----------------- Feature 4: 公众虚拟体验 -----------------
+
+type VirtualExperienceSession struct {
+	ID             uuid.UUID  `json:"id" db:"id"`
+	SessionToken   string     `json:"session_token" db:"session_token"`
+	UserID         *string    `json:"user_id,omitempty" db:"user_id"`
+	DeviceCode     string     `json:"device_code" db:"device_code"`
+	MotionMode     string     `json:"motion_mode" db:"motion_mode"`
+	StartedAt      time.Time  `json:"started_at" db:"started_at"`
+	EndedAt        *time.Time `json:"ended_at,omitempty" db:"ended_at"`
+	ParamsJSON     *string    `json:"params,omitempty" db:"params_json"`
+}
+
+type ExperienceStartRequest struct {
+	DeviceCode string  `json:"device_code" binding:"required"`
+	MotionMode string  `json:"motion_mode" binding:"required"`
+	UserName   *string `json:"user_name,omitempty"`
+}
+
+type ExperienceStartResponse struct {
+	SessionToken string        `json:"session_token"`
+	DeviceCode   string        `json:"device_code"`
+	DeviceName   string        `json:"device_name"`
+	MotionMode   string        `json:"motion_mode"`
+	ModeInfo     MotionModeInfo `json:"mode_info"`
+	ExpiresAt    time.Time     `json:"expires_at"`
+	HistoricalContext string  `json:"historical_context"`
+}
+
+type MotionModeInfo struct {
+	Key             string  `json:"key"`
+	DisplayName     string  `json:"display_name"`
+	FrequencyHz     float64 `json:"frequency_hz"`
+	BaseAmplitude   float64 `json:"base_amplitude"`
+	IntensityRange  [2]float64 `json:"intensity_range"`
+	Scene           string  `json:"scene"`
+	AncientContext  string  `json:"ancient_context"`
+}
+
+type ExperienceTickRequest struct {
+	SessionToken string    `json:"session_token" binding:"required"`
+	UserIntensity float64  `json:"user_intensity"`
+	UserRotationX *float64 `json:"user_rotation_x,omitempty"`
+	UserRotationY *float64 `json:"user_rotation_y,omitempty"`
+	UserRotationZ *float64 `json:"user_rotation_z,omitempty"`
+	TimeStepMs    float64  `json:"time_step_ms"`
+}
+
+type ExperienceFrame struct {
+	TimeSec                float64            `json:"time_sec"`
+	FrameIndex             int64              `json:"frame_index"`
+	UserIntensity          float64            `json:"user_intensity"`
+	InnerRingAngleDeg      float64            `json:"inner_ring_angle_deg"`
+	OuterRingAngleDeg      float64            `json:"outer_ring_angle_deg"`
+	MiddleRingAngleDeg     *float64           `json:"middle_ring_angle_deg,omitempty"`
+	BodyTiltDeg            float64            `json:"body_tilt_deg"`
+	BodyRotationDeg        float64            `json:"body_rotation_deg"`
+	BalanceScore           float64            `json:"balance_score"`
+	SpillRisk              float64            `json:"spill_risk"`
+	InputAccelMps2         [3]float64         `json:"input_accel_mps2"`
+	AngularVelocityDegS    [3]float64         `json:"angular_velocity_deg_s"`
+	IsSpillEvent           bool               `json:"is_spill_event"`
+	Level                  string             `json:"level"`
+	LevelProgress          float64            `json:"level_progress"`
+	HintText               *string            `json:"hint_text,omitempty"`
+}
+
+type ExperienceEndResponse struct {
+	SessionToken     string                   `json:"session_token"`
+	DurationSec      float64                  `json:"duration_sec"`
+	TotalFrames      int64                    `json:"total_frames"`
+	MaxIntensity     float64                  `json:"max_intensity"`
+	AvgBalanceScore  float64                  `json:"avg_balance_score"`
+	SpillEvents      int                      `json:"spill_events"`
+	LongestStreakSec float64                  `json:"longest_streak_sec"`
+	FinalLevel       string                   `json:"final_level"`
+	AchievementTags  []string                 `json:"achievement_tags"`
+	HistoricalInsight string                  `json:"historical_insight"`
+	SummaryChartData map[string][]float64     `json:"summary_chart_data"`
+}

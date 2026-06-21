@@ -1,6 +1,6 @@
 {
-  "description": "古代被中香炉机械参数配置 [陕西历史博物馆藏品还原]",
-  "reference": "唐代葡萄花鸟纹银熏球 - 直径4.6cm",
+  "description": "古代万向平衡机构与现代陀螺仪机械参数配置 [多装置对比]",
+  "reference": "涵盖唐代被中香炉、春秋云纹铜禁、宋代浑仪支架、现代MEMS陀螺",
   "mechanical": {
     "inner_ring": {
       "mass_kg": 0.05,
@@ -62,5 +62,146 @@
       "description": "工艺史团队复原研究模型",
       "scale_factor": 1.0
     }
-  ]
+  ],
+  "device_presets": [
+    {
+      "device_type": "incense_censer",
+      "code": "DEV-CENSER",
+      "name": "被中香炉（三环常平架）",
+      "dynasty": "唐代 公元618-907年",
+      "origin": "陕西西安何家村窖藏",
+      "rings_count": 3,
+      "description": "银质球形熏炉，三重嵌套环+宝石轴承，炉内焚香，外壁镂空花鸟纹。无论被褥中如何翻转，内部香料碗始终水平。万向平衡机构最早实物之一。",
+      "mechanical": {
+        "inner_ring": { "mass_kg": 0.05, "radius_m": 0.04, "rotation_limit_deg": 90.0, "material": "925_sterling_silver" },
+        "outer_ring": { "mass_kg": 0.08, "radius_m": 0.05, "rotation_limit_deg": 90.0, "material": "925_sterling_silver" },
+        "middle_ring": { "mass_kg": 0.065, "radius_m": 0.045, "rotation_limit_deg": 90.0, "material": "925_sterling_silver" },
+        "body": {
+          "mass_kg": 0.15, "radius_m": 0.03,
+          "moments_of_inertia": { "I_xx": 0.000054, "I_yy": 0.000054, "I_zz": 0.000054 },
+          "material": "bronze_alloy"
+        },
+        "bearings": { "friction_coefficient": 0.05, "damping_coefficient": 0.15, "type": "jewel_bearing_agate" },
+        "environment": { "gravity_mps2": 9.81, "air_viscosity_pas": 0.0000181, "temperature_c": 25.0 }
+      },
+      "aesthetic": {
+        "outer_color": "#d4af37",
+        "inner_color": "#b8860b",
+        "body_color": "#8b4513",
+        "has_decoration": true,
+        "hollow_pattern": "grape_flower_bird"
+      },
+      "historical_note": "被中香炉体现了唐代工匠对\"常平\"原理的深刻理解，比卡尔达诺环早约800年。",
+      "era_tag": "ancient_china"
+    },
+    {
+      "device_type": "bronze_jin",
+      "code": "DEV-JIN",
+      "name": "云纹铜禁承托（双环常平架）",
+      "dynasty": "春秋晚期 约公元前550年",
+      "origin": "河南淅川下寺楚墓",
+      "rings_count": 2,
+      "description": "失蜡法铸造青铜酒器承托台，双层嵌套环支撑酒樽，保证宴饮时樽体不倾。108条铜龙攀附，重达94.2kg，为早期失蜡法代表。",
+      "mechanical": {
+        "inner_ring": { "mass_kg": 12.5, "radius_m": 0.32, "rotation_limit_deg": 45.0, "material": "tin_bronze" },
+        "outer_ring": { "mass_kg": 28.3, "radius_m": 0.42, "rotation_limit_deg": 35.0, "material": "tin_bronze" },
+        "middle_ring": { "mass_kg": 0, "radius_m": 0, "rotation_limit_deg": 0, "material": "none" },
+        "body": {
+          "mass_kg": 53.4, "radius_m": 0.28,
+          "moments_of_inertia": { "I_xx": 0.836, "I_yy": 0.836, "I_zz": 1.255 },
+          "material": "tin_bronze_solid"
+        },
+        "bearings": { "friction_coefficient": 0.28, "damping_coefficient": 0.55, "type": "plain_bronze_bearing" },
+        "environment": { "gravity_mps2": 9.81, "air_viscosity_pas": 0.0000181, "temperature_c": 20.0 }
+      },
+      "aesthetic": {
+        "outer_color": "#8b7355",
+        "inner_color": "#a0522d",
+        "body_color": "#cd853f",
+        "has_decoration": true,
+        "hollow_pattern": "cloud_dragon_pattern"
+      },
+      "historical_note": "云纹铜禁是迄今所见最早的失蜡法铸件之一，双层常平结构用于礼仪场合防酒倾覆。",
+      "era_tag": "ancient_china"
+    },
+    {
+      "device_type": "armillary_mount",
+      "code": "DEV-ARMILLARY",
+      "name": "浑仪万向支架（多环嵌套）",
+      "dynasty": "北宋 公元1088年 苏颂水运仪象台",
+      "origin": "北宋汴京（今开封）",
+      "rings_count": 4,
+      "description": "苏颂、韩公廉研制的天文观测仪器支架，四重嵌套环（子午环、赤道环、黄道环、四游环），保证浑仪无论昼夜自动追踪天体时保持观测轴稳定。",
+      "mechanical": {
+        "inner_ring": { "mass_kg": 18.2, "radius_m": 0.58, "rotation_limit_deg": 85.0, "material": "cast_iron" },
+        "outer_ring": { "mass_kg": 35.6, "radius_m": 0.72, "rotation_limit_deg": 90.0, "material": "cast_iron" },
+        "middle_ring": { "mass_kg": 22.8, "radius_m": 0.65, "rotation_limit_deg": 88.0, "material": "cast_iron" },
+        "body": {
+          "mass_kg": 42.0, "radius_m": 0.50,
+          "moments_of_inertia": { "I_xx": 2.10, "I_yy": 2.10, "I_zz": 3.15 },
+          "material": "bronze_sighting_tube"
+        },
+        "bearings": { "friction_coefficient": 0.22, "damping_coefficient": 0.48, "type": "wood_lubricated_bearing" },
+        "environment": { "gravity_mps2": 9.81, "air_viscosity_pas": 0.0000181, "temperature_c": 15.0 }
+      },
+      "aesthetic": {
+        "outer_color": "#4a4a4a",
+        "inner_color": "#696969",
+        "body_color": "#b8860b",
+        "has_decoration": true,
+        "hollow_pattern": "astronomical_inscriptions"
+      },
+      "historical_note": "苏颂浑仪的四重环结构较同时代阿拉伯天文仪器更为精密，其常平原理是现代航空陀螺仪的直接先驱。",
+      "era_tag": "ancient_china"
+    },
+    {
+      "device_type": "modern_gyro",
+      "code": "DEV-GYRO",
+      "name": "现代航空姿态陀螺仪（磁浮轴承）",
+      "dynasty": "21世纪",
+      "origin": "当代航空航天工业",
+      "rings_count": 3,
+      "description": "高转速转子+磁悬浮轴承，三轴常平架+电子姿态解算，用于飞机/航天器惯性导航。对比古代常平机构的跨时代参照。",
+      "mechanical": {
+        "inner_ring": { "mass_kg": 0.22, "radius_m": 0.08, "rotation_limit_deg": 360.0, "material": "titanium_alloy" },
+        "outer_ring": { "mass_kg": 0.38, "radius_m": 0.10, "rotation_limit_deg": 360.0, "material": "titanium_alloy" },
+        "middle_ring": { "mass_kg": 0.30, "radius_m": 0.09, "rotation_limit_deg": 360.0, "material": "titanium_alloy" },
+        "body": {
+          "mass_kg": 0.45, "radius_m": 0.06,
+          "moments_of_inertia": { "I_xx": 0.00162, "I_yy": 0.00162, "I_zz": 0.00081 },
+          "material": "high_speed_rotor_spin_24000rpm"
+        },
+        "bearings": { "friction_coefficient": 0.0008, "damping_coefficient": 0.005, "type": "active_magnetic_bearing" },
+        "environment": { "gravity_mps2": 9.81, "air_viscosity_pas": 0.0000181, "temperature_c": 45.0 }
+      },
+      "aesthetic": {
+        "outer_color": "#c0c0c0",
+        "inner_color": "#87ceeb",
+        "body_color": "#00ced1",
+        "has_decoration": false,
+        "hollow_pattern": "none"
+      },
+      "historical_note": "现代陀螺的原理本质仍是常平架，但其精度（0.001°/h）比唐代香炉提高了约8个数量级，代表了两千年来力学原理的工程化登峰。",
+      "era_tag": "modern"
+    }
+  ],
+  "cross_era_metrics": {
+    "description": "跨时代对比的关键评价维度",
+    "dimensions": [
+      { "key": "precision_angle_deg", "label": "稳态精度 (°)", "lower_is_better": true },
+      { "key": "response_time_ms", "label": "阶跃响应时间 (ms)", "lower_is_better": true },
+      { "key": "disturbance_rejection_db", "label": "扰动力衰减 (dB)", "lower_is_better": false },
+      { "key": "power_consumption_w", "label": "能耗 (W)", "lower_is_better": true },
+      { "key": "mtbf_hours", "label": "平均无故障时间 (h)", "lower_is_better": false },
+      { "key": "manufacture_complexity", "label": "制造复杂度 (1-10)", "lower_is_better": true },
+      { "key": "aesthetic_value", "label": "工艺美学价值 (1-10)", "lower_is_better": false },
+      { "key": "cultural_significance", "label": "文明史意义 (1-10)", "lower_is_better": false }
+    ]
+  },
+  "viscosity_scan": {
+    "description": "香料粘度扫描分析参数范围",
+    "viscosity_range_pas": [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0],
+    "temperature_range_c": [20, 30, 40, 50, 60, 70, 80, 90, 100],
+    "fill_ratio_range": [0.2, 0.3, 0.4, 0.5, 0.55, 0.6, 0.7, 0.8]
+  }
 }

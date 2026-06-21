@@ -30,6 +30,7 @@ type Handler struct {
 	gimbalSimulator   *services.GimbalSimulatorService
 	sloshAnalyzer     *services.SloshAnalyzerService
 	alarmWs           *services.AlarmWsService
+	comparisonService *services.ComparisonService
 	db                *database.DB
 }
 
@@ -38,14 +39,16 @@ func NewHandlerWithServices(
 	gimbalSimulator *services.GimbalSimulatorService,
 	sloshAnalyzer *services.SloshAnalyzerService,
 	alarmWs *services.AlarmWsService,
+	comparisonService *services.ComparisonService,
 	db *database.DB,
 ) *Handler {
 	return &Handler{
-		dtuReceiver:     dtuReceiver,
-		gimbalSimulator: gimbalSimulator,
-		sloshAnalyzer:   sloshAnalyzer,
-		alarmWs:         alarmWs,
-		db:              db,
+		dtuReceiver:       dtuReceiver,
+		gimbalSimulator:   gimbalSimulator,
+		sloshAnalyzer:     sloshAnalyzer,
+		alarmWs:           alarmWs,
+		comparisonService: comparisonService,
+		db:                db,
 	}
 }
 
@@ -438,6 +441,125 @@ func (h *Handler) HealthCheck(c *gin.Context) {
 			"gimbal_simulator":  "running",
 			"slosh_analyzer":    "running",
 			"alarm_ws":          "running",
+			"comparison_service": "running",
 		},
 	})
+}
+
+// ==========================
+// Feature 1: 装置对比
+// ==========================
+
+func (h *Handler) GetDevicePresets(c *gin.Context) {
+	eraTag := c.Query("era")
+	mp := config.Mechanical
+	if mp == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "config not loaded"})
+		return
+	}
+	presets := mp.ListDevicePresetsByEra(eraTag)
+	c.JSON(http.StatusOK, presets)
+}
+
+func (h *Handler) RunDeviceComparison(c *gin.Context) {
+	var req models.DeviceComparisonRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	result, err := h.comparisonService.RunDeviceComparison(&req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+// ==========================
+// Feature 2: 跨时代对比
+// ==========================
+
+func (h *Handler) RunCrossEraComparison(c *gin.Context) {
+	var req models.CrossEraComparisonRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	result, err := h.comparisonService.RunCrossEraComparison(&req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+// ==========================
+// Feature 3: 香料粘度影响分析
+// ==========================
+
+func (h *Handler) RunViscosityScan(c *gin.Context) {
+	var req models.ViscosityScanRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	result, err := h.comparisonService.RunViscosityScan(&req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+// ==========================
+// Feature 4: 公众虚拟体验
+// ==========================
+
+func (h *Handler) GetMotionModes(c *gin.Context) {
+	modes := h.comparisonService.ListMotionModes()
+	c.JSON(http.StatusOK, modes)
+}
+
+func (h *Handler) StartExperience(c *gin.Context) {
+	var req models.ExperienceStartRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	result, err := h.comparisonService.StartExperience(&req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+func (h *Handler) TickExperience(c *gin.Context) {
+	var req models.ExperienceTickRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	frame, err := h.comparisonService.TickExperience(&req)
+	if err != nil {
+		c.JSON(http.StatusGone, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, frame)
+}
+
+func (h *Handler) EndExperience(c *gin.Context) {
+	var req struct {
+		SessionToken string `json:"session_token" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	result, err := h.comparisonService.EndExperience(req.SessionToken)
+	if err != nil {
+		c.JSON(http.StatusGone, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, result)
 }

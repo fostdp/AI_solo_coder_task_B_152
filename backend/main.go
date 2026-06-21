@@ -83,9 +83,12 @@ func main() {
 	defer alarmWs.Stop()
 	log.Println("Alarm & WebSocket Service started")
 
+	comparisonService := services.NewComparisonService()
+	log.Println("Comparison Service started")
+
 	go updateMetrics(alarmWs)
 
-	h := handlers.NewHandlerWithServices(dtuReceiver, gimbalSimulator, sloshAnalyzer, alarmWs, db)
+	h := handlers.NewHandlerWithServices(dtuReceiver, gimbalSimulator, sloshAnalyzer, alarmWs, comparisonService, db)
 
 	gin.SetMode(gin.ReleaseMode)
 	if os.Getenv("GIN_MODE") == "debug" {
@@ -133,6 +136,22 @@ func main() {
 		api.GET("/censers/:id/frequency-response", h.GetFrequencyResponse)
 
 		api.POST("/censers/:id/gimbal-simulation", h.RunGimbalSimulation)
+
+		// ===== Feature 1: 古代常平架装置对比 =====
+		api.GET("/device-presets", h.GetDevicePresets)
+		api.POST("/device-comparison", h.RunDeviceComparison)
+
+		// ===== Feature 2: 跨时代对比 =====
+		api.POST("/cross-era-comparison", h.RunCrossEraComparison)
+
+		// ===== Feature 3: 香料粘度影响分析 =====
+		api.POST("/viscosity-scan", h.RunViscosityScan)
+
+		// ===== Feature 4: 公众虚拟体验 =====
+		api.GET("/experience/motion-modes", h.GetMotionModes)
+		api.POST("/experience/start", h.StartExperience)
+		api.POST("/experience/tick", h.TickExperience)
+		api.POST("/experience/end", h.EndExperience)
 	}
 
 	r.GET("/metrics", metrics.PrometheusHandler())

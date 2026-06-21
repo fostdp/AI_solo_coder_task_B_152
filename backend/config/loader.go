@@ -7,16 +7,20 @@ import (
 )
 
 type MechanicalConfig struct {
-	Description   string               `json:"description"`
-	Reference     string               `json:"reference"`
-	Mechanical    MechanicalParams     `json:"mechanical"`
-	AlarmThresholds AlarmThresholds     `json:"alarm_thresholds"`
-	Presets       []CenserPreset       `json:"presets"`
+	Description      string               `json:"description"`
+	Reference        string               `json:"reference"`
+	Mechanical       MechanicalParams     `json:"mechanical"`
+	AlarmThresholds  AlarmThresholds      `json:"alarm_thresholds"`
+	Presets          []CenserPreset       `json:"presets"`
+	DevicePresets    []DevicePreset       `json:"device_presets"`
+	CrossEraMetrics  CrossEraMetrics      `json:"cross_era_metrics"`
+	ViscosityScan    ViscosityScanConfig  `json:"viscosity_scan"`
 }
 
 type MechanicalParams struct {
 	InnerRing   RingParams       `json:"inner_ring"`
 	OuterRing   RingParams       `json:"outer_ring"`
+	MiddleRing  RingParams       `json:"middle_ring"`
 	Body        BodyParams       `json:"body"`
 	Bearings    BearingParams    `json:"bearings"`
 	Environment EnvironmentParams `json:"environment"`
@@ -68,6 +72,46 @@ type CenserPreset struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	ScaleFactor float64 `json:"scale_factor"`
+}
+
+type DevicePreset struct {
+	DeviceType       string              `json:"device_type"`
+	Code             string              `json:"code"`
+	Name             string              `json:"name"`
+	Dynasty          string              `json:"dynasty"`
+	Origin           string              `json:"origin"`
+	RingsCount       int                 `json:"rings_count"`
+	Description      string              `json:"description"`
+	Mechanical       MechanicalParams    `json:"mechanical"`
+	Aesthetic        AestheticConfig     `json:"aesthetic"`
+	HistoricalNote   string              `json:"historical_note"`
+	EraTag           string              `json:"era_tag"`
+}
+
+type AestheticConfig struct {
+	OuterColor     string `json:"outer_color"`
+	InnerColor     string `json:"inner_color"`
+	BodyColor      string `json:"body_color"`
+	HasDecoration  bool   `json:"has_decoration"`
+	HollowPattern  string `json:"hollow_pattern"`
+}
+
+type CrossEraMetrics struct {
+	Description string             `json:"description"`
+	Dimensions  []MetricDimension  `json:"dimensions"`
+}
+
+type MetricDimension struct {
+	Key              string `json:"key"`
+	Label            string `json:"label"`
+	LowerIsBetter    bool   `json:"lower_is_better"`
+}
+
+type ViscosityScanConfig struct {
+	Description       string    `json:"description"`
+	ViscosityRangePas []float64 `json:"viscosity_range_pas"`
+	TemperatureRangeC []float64 `json:"temperature_range_c"`
+	FillRatioRange    []float64 `json:"fill_ratio_range"`
 }
 
 type FluidConfig struct {
@@ -177,4 +221,23 @@ func (m *MechanicalConfig) GetPreset(code string) *CenserPreset {
 		}
 	}
 	return nil
+}
+
+func (m *MechanicalConfig) GetDevicePreset(code string) *DevicePreset {
+	for i := range m.DevicePresets {
+		if m.DevicePresets[i].Code == code {
+			return &m.DevicePresets[i]
+		}
+	}
+	return nil
+}
+
+func (m *MechanicalConfig) ListDevicePresetsByEra(eraTag string) []DevicePreset {
+	var result []DevicePreset
+	for i := range m.DevicePresets {
+		if eraTag == "" || m.DevicePresets[i].EraTag == eraTag {
+			result = append(result, m.DevicePresets[i])
+		}
+	}
+	return result
 }

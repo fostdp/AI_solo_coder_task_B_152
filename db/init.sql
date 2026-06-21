@@ -372,3 +372,177 @@ SELECT add_continuous_aggregate_policy(
 -- | 1小时    | 1年       | 30分钟    |
 -- | 1天      | 永久      | 6小时     |
 -- ============================================================
+
+-- ============================================================
+-- Feature 扩展: 古代常平架装置信息表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS gimbal_devices (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_code VARCHAR(64) UNIQUE NOT NULL,
+    device_type VARCHAR(64) NOT NULL,
+    name VARCHAR(256) NOT NULL,
+    dynasty VARCHAR(128),
+    origin VARCHAR(256),
+    rings_count INTEGER NOT NULL DEFAULT 3,
+    description TEXT,
+    historical_note TEXT,
+    era_tag VARCHAR(32) NOT NULL DEFAULT 'ancient_china',
+    mechanical_params JSONB,
+    aesthetic_config JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_gimbal_devices_era ON gimbal_devices(era_tag);
+CREATE INDEX IF NOT EXISTS idx_gimbal_devices_type ON gimbal_devices(device_type);
+
+-- ============================================================
+-- Feature 扩展: 装置对比分析结果表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS device_balance_comparisons (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id VARCHAR(128) UNIQUE NOT NULL,
+    motion_profile VARCHAR(64) NOT NULL,
+    duration_sec FLOAT8 NOT NULL DEFAULT 10,
+    time_step_ms FLOAT8 NOT NULL DEFAULT 16,
+    device_codes VARCHAR(128) NOT NULL,
+    ranking_summary JSONB,
+    analysis_data JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_comparisons_profile ON device_balance_comparisons(motion_profile);
+CREATE INDEX IF NOT EXISTS idx_comparisons_created ON device_balance_comparisons(created_at DESC);
+
+-- ============================================================
+-- Feature 扩展: 跨时代对比结果表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS cross_era_comparisons (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(256),
+    ancient_device_codes VARCHAR(256) NOT NULL,
+    modern_device_codes VARCHAR(256) NOT NULL,
+    motion_profile VARCHAR(64),
+    dimensions JSONB,
+    ancient_summary JSONB,
+    modern_summary JSONB,
+    overall_score JSONB,
+    historical_intro TEXT,
+    philosophy_note TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_cross_era_created ON cross_era_comparisons(created_at DESC);
+
+-- ============================================================
+-- Feature 扩展: 香料粘度扫描结果表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS viscosity_scan_results (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_code VARCHAR(64) NOT NULL,
+    motion_profile VARCHAR(64) NOT NULL,
+    temperature_c FLOAT8 NOT NULL DEFAULT 25,
+    fill_ratio FLOAT8 NOT NULL DEFAULT 0.55,
+    scan_points JSONB NOT NULL,
+    optimal_viscosity_pas FLOAT8,
+    critical_viscosity_pas FLOAT8,
+    fit_equation VARCHAR(256),
+    correlation_r2 FLOAT8,
+    recommendation TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_viscosity_device ON viscosity_scan_results(device_code);
+CREATE INDEX IF NOT EXISTS idx_viscosity_profile ON viscosity_scan_results(motion_profile);
+
+-- ============================================================
+-- Feature 扩展: 虚拟体验会话表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS virtual_experience_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_token VARCHAR(128) UNIQUE NOT NULL,
+    user_id VARCHAR(128),
+    device_code VARCHAR(64) NOT NULL,
+    motion_mode VARCHAR(64) NOT NULL,
+    started_at TIMESTAMPTZ NOT NULL,
+    ended_at TIMESTAMPTZ,
+    duration_sec FLOAT8,
+    total_frames BIGINT,
+    avg_balance_score FLOAT8,
+    spill_events INTEGER,
+    longest_streak_sec FLOAT8,
+    final_level VARCHAR(128),
+    achievement_tags VARCHAR(256),
+    max_intensity FLOAT8,
+    summary_chart JSONB,
+    params JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_exp_token ON virtual_experience_sessions(session_token);
+CREATE INDEX IF NOT EXISTS idx_exp_device ON virtual_experience_sessions(device_code);
+CREATE INDEX IF NOT EXISTS idx_exp_started ON virtual_experience_sessions(started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_exp_level ON virtual_experience_sessions(final_level);
+
+-- ============================================================
+-- 体验成就排行榜视图
+-- ============================================================
+CREATE OR REPLACE VIEW v_experience_leaderboard AS
+SELECT
+    ROW_NUMBER() OVER (
+        ORDER BY (avg_balance_score * 100 - spill_events * 15 + COALESCE(longest_streak_sec,0)) DESC
+    ) AS rank,
+    id,
+    COALESCE(user_id, '匿名访客') AS user_name,
+    device_code,
+    motion_mode,
+    final_level,
+    ROUND(COALESCE(avg_balance_score,0)*100, 1) AS balance_score_100,
+    COALESCE(spill_events, 0) AS spill_events,
+    ROUND(COALESCE(longest_streak_sec,0), 1) AS longest_streak_sec,
+    ROUND(COALESCE(duration_sec,0), 0) AS duration_sec,
+    achievement_tags,
+    started_at
+FROM virtual_experience_sessions
+WHERE ended_at IS NOT NULL AND duration_sec > 30
+ORDER BY rank ASC
+LIMIT 100;
+
+-- ============================================================
+-- 扩展触发器
+-- ============================================================
+DROP TRIGGER IF EXISTS devices_update_updated_at ON gimbal_devices;
+CREATE TRIGGER devices_update_updated_at
+    BEFORE UPDATE ON gimbal_devices
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ============================================================
+-- 初始化装置预设（如无数据时）
+-- ============================================================
+INSERT INTO gimbal_devices (device_code, device_type, name, dynasty, origin, rings_count, era_tag, description, historical_note)
+VALUES
+    ('DEV-CENSER', 'incense_censer', '被中香炉（三环常平架）', '唐代 公元618-907年', '陕西西安何家村窖藏', 3, 'ancient_china',
+     '银质球形熏炉，三重嵌套环+宝石轴承，万向平衡机构最早实物之一。',
+     '体现唐代工匠对"常平"原理的深刻理解，比卡尔达诺环早约800年。'),
+    ('DEV-JIN', 'bronze_jin', '云纹铜禁承托（双环常平架）', '春秋晚期 约公元前550年', '河南淅川下寺楚墓', 2, 'ancient_china',
+     '失蜡法铸造青铜酒器承托台，双层嵌套环支撑酒樽防倾覆。',
+     '迄今所见最早的失蜡法铸件之一，双层常平结构用于礼仪场合。'),
+    ('DEV-ARMILLARY', 'armillary_mount', '浑仪万向支架（多环嵌套）', '北宋 公元1088年 苏颂水运仪象台', '北宋汴京', 4, 'ancient_china',
+     '苏颂、韩公廉研制天文仪器支架，四重嵌套环保证观测轴稳定。',
+     '常平原理是现代航空陀螺仪的直接先驱。'),
+    ('DEV-GYRO', 'modern_gyro', '现代航空姿态陀螺仪（磁浮轴承）', '21世纪', '当代航空航天工业', 3, 'modern',
+     '高转速转子+磁悬浮轴承，三轴常平架+电子姿态解算。',
+     '现代陀螺精度比唐代香炉提高了约8个数量级。')
+ON CONFLICT (device_code) DO NOTHING;
+
+-- ============================================================
+-- Feature 扩展总结
+-- ============================================================
+-- 新增表:
+--   gimbal_devices                古代/现代常平装置元信息
+--   device_balance_comparisons   装置对比分析结果
+--   cross_era_comparisons        跨时代对比结果
+--   viscosity_scan_results       香料粘度扫描结果
+--   virtual_experience_sessions  公众虚拟体验会话
+--   v_experience_leaderboard     体验成就排行榜
+-- ============================================================
