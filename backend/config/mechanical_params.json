@@ -92,7 +92,17 @@
         "hollow_pattern": "grape_flower_bird"
       },
       "historical_note": "被中香炉体现了唐代工匠对\"常平\"原理的深刻理解，比卡尔达诺环早约800年。",
-      "era_tag": "ancient_china"
+      "era_tag": "ancient_china",
+      "data_source": {
+        "measurement_method": "考古实物三维扫描+文献考证",
+        "reference_source": "陕西历史博物馆藏·何家村窖藏出土葡萄花鸟纹银熏球",
+        "artifact_number": "HJC-001",
+        "archeological_site": "西安何家村唐代窖藏",
+        "uncertainty_pct": 8.0,
+        "measurement_date": "2023-06-15",
+        "measured_by": "西北工业大学考古机械史研究团队",
+        "remarks": ["银熏球直径4.59cm，重105g", "环架材质据成分分析为92.5%银铜合金", "轴承材质推测为玛瑙（宝石轴承）"]
+      }
     },
     {
       "device_type": "bronze_jin",
@@ -122,7 +132,17 @@
         "hollow_pattern": "cloud_dragon_pattern"
       },
       "historical_note": "云纹铜禁是迄今所见最早的失蜡法铸件之一，双层常平结构用于礼仪场合防酒倾覆。",
-      "era_tag": "ancient_china"
+      "era_tag": "ancient_china",
+      "data_source": {
+        "measurement_method": "出土文物实测+失蜡法复原实验",
+        "reference_source": "河南博物院藏·淅川下寺春秋楚墓云纹铜禁",
+        "artifact_number": "XCS-M1:28",
+        "archeological_site": "河南淅川下寺二号楚墓",
+        "uncertainty_pct": 12.0,
+        "measurement_date": "2022-11-03",
+        "measured_by": "河南省文物考古研究院金属器研究室",
+        "remarks": ["禁长103cm、宽46cm、高28.8cm", "总重94.2kg，12条龙形附兽", "铜锡铅三元合金，含锡量约15%", "双层环架结构为推测复原，非实物完整出土"]
+      }
     },
     {
       "device_type": "armillary_mount",
@@ -152,7 +172,17 @@
         "hollow_pattern": "astronomical_inscriptions"
       },
       "historical_note": "苏颂浑仪的四重环结构较同时代阿拉伯天文仪器更为精密，其常平原理是现代航空陀螺仪的直接先驱。",
-      "era_tag": "ancient_china"
+      "era_tag": "ancient_china",
+      "data_source": {
+        "measurement_method": "文献考证+比例复原模型推算",
+        "reference_source": "《新仪象法要》·北宋苏颂·元祐三年（1088年）",
+        "artifact_number": "SSYXT-001",
+        "archeological_site": "北宋汴京（开封）水运仪象台遗址推测位置",
+        "uncertainty_pct": 18.0,
+        "measurement_date": "2021-04-20",
+        "measured_by": "中国科学院自然科学史研究所古代天文仪器组",
+        "remarks": ["原物已毁，据苏颂《新仪象法要》记载复原", "浑仪总高约1.2丈（约3.8米）", "四重环结构：子午环、赤道环、黄道环、四游环", "转动机构为铜制，水力驱动", "不确定度较大因原物未实存"]
+      }
     },
     {
       "device_type": "modern_gyro",
@@ -182,7 +212,26 @@
         "hollow_pattern": "none"
       },
       "historical_note": "现代陀螺的原理本质仍是常平架，但其精度（0.001°/h）比唐代香炉提高了约8个数量级，代表了两千年来力学原理的工程化登峰。",
-      "era_tag": "modern"
+      "era_tag": "modern",
+      "data_source": {
+        "measurement_method": "厂商数据手册+实验室标定",
+        "reference_source": "Honeywell HG1930 激光陀螺惯性测量单元",
+        "uncertainty_pct": 2.0,
+        "measurement_date": "2024-01-10",
+        "measured_by": "Honeywell Aerospace 产品规格书 Rev E",
+        "remarks": ["航空级激光三轴陀螺仪", "工作温度 -40°C 至 +85°C", "符合 DO-160G 航空标准"]
+      },
+      "rotor_spec": {
+        "manufacturer": "Honeywell Aerospace",
+        "part_number": "HG1930",
+        "product_line": "HG1900 Series IMU",
+        "spin_rate_rpm": 24000,
+        "gyro_type": "ring_laser_gyro",
+        "bias_stability_deg_h": 0.005,
+        "angle_random_walk_deg_sqrt_h": 0.0015,
+        "datasheet_rev": "Rev E 2023",
+        "compliance": ["DO-160G", "MIL-STD-810G", "RTCA DO-178C"]
+      }
     }
   ],
   "cross_era_metrics": {

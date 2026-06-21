@@ -86,6 +86,31 @@ type DevicePreset struct {
 	Aesthetic        AestheticConfig     `json:"aesthetic"`
 	HistoricalNote   string              `json:"historical_note"`
 	EraTag           string              `json:"era_tag"`
+	DataSource       *DataSource         `json:"data_source,omitempty"`
+	RotorSpec        *RotorSpec          `json:"rotor_spec,omitempty"`
+}
+
+type DataSource struct {
+	MeasurementMethod string   `json:"measurement_method"`
+	ReferenceSource   string   `json:"reference_source"`
+	UncertaintyPct    float64  `json:"uncertainty_pct"`
+	MeasurementDate   string   `json:"measurement_date,omitempty"`
+	MeasuredBy        string   `json:"measured_by,omitempty"`
+	ArcheologicalSite string   `json:"archeological_site,omitempty"`
+	ArtifactNumber    string   `json:"artifact_number,omitempty"`
+	Remarks           []string `json:"remarks,omitempty"`
+}
+
+type RotorSpec struct {
+	Manufacturer   string  `json:"manufacturer"`
+	PartNumber     string  `json:"part_number"`
+	ProductLine    string  `json:"product_line"`
+	SpinRateRpm    float64 `json:"spin_rate_rpm"`
+	GyroType       string  `json:"gyro_type"`
+	BiasStabilityDegH float64 `json:"bias_stability_deg_h"`
+	AngleRWDegSqrtH  float64 `json:"angle_random_walk_deg_sqrt_h"`
+	DatasheetRev   string  `json:"datasheet_rev,omitempty"`
+	Compliance     []string `json:"compliance,omitempty"`
 }
 
 type AestheticConfig struct {
@@ -132,6 +157,24 @@ type PerfumeFormula struct {
 	ViscosityTemperatureCoeff float64           `json:"viscosity_temperature_coeff"`
 	DensityKgm3              float64           `json:"density_kgm3"`
 	SurfaceTensionNm         float64           `json:"surface_tension_nm"`
+	RheologyData             *RheologyData     `json:"rheology_data,omitempty"`
+}
+
+type RheologyData struct {
+	MeasurementMethod  string              `json:"measurement_method"`
+	InstrumentModel    string              `json:"instrument_model"`
+	ReferenceTempC     float64             `json:"reference_temp_c"`
+	ShearRateSweep     []float64           `json:"shear_rate_sweep_s1,omitempty"`
+	TemperatureSweep   []TempViscosityPoint `json:"temperature_sweep,omitempty"`
+	Newtonian          bool                `json:"newtonian"`
+	ReferenceLiterature []string           `json:"reference_literature,omitempty"`
+	TestStandard       string              `json:"test_standard,omitempty"`
+	UncertaintyPct     float64             `json:"uncertainty_pct"`
+}
+
+type TempViscosityPoint struct {
+	TempC        float64 `json:"temp_c"`
+	ViscosityPas float64 `json:"viscosity_pas"`
 }
 
 type Ingredient struct {
@@ -155,12 +198,29 @@ type FillRatioCoefficients struct {
 }
 
 type MotionProfile struct {
-	Name               string  `json:"name"`
-	FrequencyHz        float64 `json:"frequency_hz"`
-	AmplitudeMps2      float64 `json:"amplitude_mps2"`
-	DurationSec        float64 `json:"duration_sec"`
-	TypicalUsage       string  `json:"typical_usage"`
-	HistoricalReference string `json:"historical_reference"`
+	Name               string              `json:"name"`
+	FrequencyHz        float64             `json:"frequency_hz"`
+	AmplitudeMps2      float64             `json:"amplitude_mps2"`
+	DurationSec        float64             `json:"duration_sec"`
+	TypicalUsage       string              `json:"typical_usage"`
+	HistoricalReference string             `json:"historical_reference"`
+	GaitBiomechanics   *GaitBiomechanics  `json:"gait_biomechanics,omitempty"`
+}
+
+type GaitBiomechanics struct {
+	DataSource           string    `json:"data_source"`
+	StudyReference       string    `json:"study_reference"`
+	SampleSize           int       `json:"sample_size"`
+	Population           string    `json:"population"`
+	CadenceStepsPerMin   float64   `json:"cadence_steps_per_min"`
+	StepLengthM          float64   `json:"step_length_m"`
+	VerticalAccelPeakG   float64   `json:"vertical_accel_peak_g"`
+	ForeAftAccelPeakG    float64   `json:"fore_aft_accel_peak_g"`
+	MediolateralAccelPeakG float64 `json:"mediolateral_accel_peak_g"`
+	StepFrequencyHz      float64   `json:"step_frequency_hz"`
+	UncertaintyPct       float64   `json:"uncertainty_pct"`
+	MeasurementMethod    string    `json:"measurement_method,omitempty"`
+	Equipment            []string  `json:"equipment,omitempty"`
 }
 
 var (

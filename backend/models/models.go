@@ -340,6 +340,19 @@ type MotionModeInfo struct {
 	IntensityRange  [2]float64 `json:"intensity_range"`
 	Scene           string  `json:"scene"`
 	AncientContext  string  `json:"ancient_context"`
+	BiomechanicsRef *BiomechanicsRef `json:"biomechanics_ref,omitempty"`
+}
+
+type BiomechanicsRef struct {
+	DataSource       string   `json:"data_source"`
+	StudyReference   string   `json:"study_reference"`
+	SampleSize       int      `json:"sample_size"`
+	CadenceStepsPerMin float64 `json:"cadence_steps_per_min"`
+	VerticalAccelPeakG float64 `json:"vertical_accel_peak_g"`
+	StepFrequencyHz  float64  `json:"step_frequency_hz"`
+	UncertaintyPct   float64  `json:"uncertainty_pct"`
+	MeasurementMethod string  `json:"measurement_method,omitempty"`
+	Equipment        []string `json:"equipment,omitempty"`
 }
 
 type ExperienceTickRequest struct {
