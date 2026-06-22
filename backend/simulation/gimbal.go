@@ -40,7 +40,7 @@ func (g *GimbalSimulator) outerRingDynamics(dt float64, force *models.ExternalFo
 	I_outer := g.calculateRingMomentOfInertia(g.Config.OuterRingMass, g.Config.OuterRingRadius)
 	outerAngleRad := g.State.OuterAngle * math.Pi / 180.0
 
-	omega_outer := g.State.OuterVelocity * math.Pi / 180.0
+	_ = g.State.OuterVelocity * math.Pi / 180.0
 	omega_inner := g.State.InnerVelocity * math.Pi / 180.0
 	omega_body := g.State.BodyVelocity * math.Pi / 180.0
 
@@ -71,7 +71,7 @@ func (g *GimbalSimulator) innerRingDynamics(dt float64, force *models.ExternalFo
 	innerAngleRad := g.State.InnerAngle * math.Pi / 180.0
 
 	omega_outer := g.State.OuterVelocity * math.Pi / 180.0
-	omega_inner := g.State.InnerVelocity * math.Pi / 180.0
+	_ = g.State.InnerVelocity * math.Pi / 180.0
 	omega_body := g.State.BodyVelocity * math.Pi / 180.0
 
 	gravityTorque := g.Config.InnerRingMass * g.Config.Gravity * g.Config.InnerRingRadius *

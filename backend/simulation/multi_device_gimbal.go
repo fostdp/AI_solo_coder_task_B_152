@@ -257,7 +257,7 @@ func (m *MultiDeviceSimulator) stepThreeRingGyro(dt float64, force *models.Exter
 	m.stepThreeRing(dt, force)
 	L := m.I_zz * m.State.RotorSpinVelocity
 	oRad := m.State.OuterAngle * math.Pi / 180
-	iRad := m.State.InnerAngle * math.Pi / 180
+	_ = m.State.InnerAngle * math.Pi / 180
 	omega_o := m.State.OuterVelocity * math.Pi / 180
 	omega_i := m.State.InnerVelocity * math.Pi / 180
 

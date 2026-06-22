@@ -83,12 +83,15 @@ func main() {
 	defer alarmWs.Stop()
 	log.Println("Alarm & WebSocket Service started")
 
-	comparisonService := services.NewComparisonService()
-	log.Println("Comparison Service started")
+	deviceComp := services.NewDeviceComparator()
+	eraComp := services.NewEraComparator(deviceComp)
+	viscAnal := services.NewViscosityAnalyzer()
+	vrGimbal := services.NewVrGimbal()
+	log.Println("Device Comparator, Era Comparator, Viscosity Analyzer, VrGimbal started")
 
 	go updateMetrics(alarmWs)
 
-	h := handlers.NewHandlerWithServices(dtuReceiver, gimbalSimulator, sloshAnalyzer, alarmWs, comparisonService, db)
+	h := handlers.NewHandlerWithServices(dtuReceiver, gimbalSimulator, sloshAnalyzer, alarmWs, deviceComp, eraComp, viscAnal, vrGimbal, db)
 
 	gin.SetMode(gin.ReleaseMode)
 	if os.Getenv("GIN_MODE") == "debug" {

@@ -26,12 +26,15 @@ var upgrader = websocket.Upgrader{
 }
 
 type Handler struct {
-	dtuReceiver       *services.DtuReceiver
-	gimbalSimulator   *services.GimbalSimulatorService
-	sloshAnalyzer     *services.SloshAnalyzerService
-	alarmWs           *services.AlarmWsService
-	comparisonService *services.ComparisonService
-	db                *database.DB
+	dtuReceiver     *services.DtuReceiver
+	gimbalSimulator *services.GimbalSimulatorService
+	sloshAnalyzer   *services.SloshAnalyzerService
+	alarmWs         *services.AlarmWsService
+	deviceComp      *services.DeviceComparator
+	eraComp         *services.EraComparator
+	viscAnal        *services.ViscosityAnalyzer
+	vrGimbal        *services.VrGimbal
+	db              *database.DB
 }
 
 func NewHandlerWithServices(
@@ -39,16 +42,22 @@ func NewHandlerWithServices(
 	gimbalSimulator *services.GimbalSimulatorService,
 	sloshAnalyzer *services.SloshAnalyzerService,
 	alarmWs *services.AlarmWsService,
-	comparisonService *services.ComparisonService,
+	deviceComp *services.DeviceComparator,
+	eraComp *services.EraComparator,
+	viscAnal *services.ViscosityAnalyzer,
+	vrGimbal *services.VrGimbal,
 	db *database.DB,
 ) *Handler {
 	return &Handler{
-		dtuReceiver:       dtuReceiver,
-		gimbalSimulator:   gimbalSimulator,
-		sloshAnalyzer:     sloshAnalyzer,
-		alarmWs:           alarmWs,
-		comparisonService: comparisonService,
-		db:                db,
+		dtuReceiver:     dtuReceiver,
+		gimbalSimulator: gimbalSimulator,
+		sloshAnalyzer:   sloshAnalyzer,
+		alarmWs:         alarmWs,
+		deviceComp:      deviceComp,
+		eraComp:         eraComp,
+		viscAnal:        viscAnal,
+		vrGimbal:        vrGimbal,
+		db:              db,
 	}
 }
 
@@ -467,7 +476,7 @@ func (h *Handler) RunDeviceComparison(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	result, err := h.comparisonService.RunDeviceComparison(&req)
+	result, err := h.deviceComp.RunDeviceComparison(&req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -485,7 +494,7 @@ func (h *Handler) RunCrossEraComparison(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	result, err := h.comparisonService.RunCrossEraComparison(&req)
+	result, err := h.eraComp.RunCrossEraComparison(&req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -516,7 +525,7 @@ func (h *Handler) RunViscosityScan(c *gin.Context) {
 // ==========================
 
 func (h *Handler) GetMotionModes(c *gin.Context) {
-	modes := h.comparisonService.ListMotionModes()
+	modes := services.ListMotionModes()
 	c.JSON(http.StatusOK, modes)
 }
 
@@ -540,7 +549,7 @@ func (h *Handler) TickExperience(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	frame, err := h.comparisonService.TickExperience(&req)
+	frame, err := h.vrGimbal.TickExperience(&req)
 	if err != nil {
 		c.JSON(http.StatusGone, gin.H{"error": err.Error()})
 		return
